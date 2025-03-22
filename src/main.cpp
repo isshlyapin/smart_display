@@ -60,6 +60,7 @@ void setup() {
 }
 
 void loop() {
+    Serial.printf("Free heap loop: %d\n", ESP.getFreeHeap());
     updateBrightness();
     updateImage();
     vTaskDelay(MAIN_LOOP_DELAY / portTICK_PERIOD_MS);

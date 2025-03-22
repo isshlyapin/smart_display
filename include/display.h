@@ -6,6 +6,7 @@
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 
 #include "images.h"
+#include "config.h"
 #include "time_controller.h"
 #include "wifi_controller.h"
 
@@ -60,6 +61,22 @@ class DisplayController {
     MatrixPanel_I2S_DMA* getDisplay() {
         return display;
     }
+
+    void setColor(int r, int g, int b) {
+        if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+            return;
+        }
+        mutex_color.lock();
+        color = display->color565(r, g, b);
+        mutex_color.unlock();
+    }
+
+    uint16_t getColor() {
+        mutex_color.lock();
+        uint16_t color = this->color;
+        mutex_color.unlock();
+        return color;
+    }
     
     private:
     DisplayController() : brightness(100), image(ImageType::BEAUTIFUL_CLOCK_IMAGE) {
@@ -70,15 +87,25 @@ class DisplayController {
         );
         
         display = new MatrixPanel_I2S_DMA(mxconfig);
+        
         if (NVS.begin()) {
             brightness = NVS.getInt("brightness");
             if (brightness) {
                 this->brightness = brightness;
             }
+            
+            int r = NVS.getInt("color_r", -1);
+            int g = NVS.getInt("color_g", -1);
+            int b = NVS.getInt("color_b", -1);
+            if (r != -1 && g != -1 && b != -1) {
+                color = display->color565(r, g, b);
+            } else {
+                color = display->color565(DEFAULT_COLOR_R, DEFAULT_COLOR_G, DEFAULT_COLOR_B);
+            }
             NVS.close();
         }
     }
-    
+
     DisplayController(DisplayController const&) = delete;
     void operator=(DisplayController const&) = delete;
     
@@ -86,6 +113,8 @@ class DisplayController {
         delete display;
     }
     
+    uint16_t color;
+    std::mutex mutex_color;
     int brightness;
     std::mutex mutex_brightness;
     enum ImageType image;

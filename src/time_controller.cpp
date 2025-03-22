@@ -11,8 +11,7 @@ void timeSetup() {
 
     String timezone = NVS.getString("timezone");
     if (timezone) {
-        // configTime(atoi(timezone.c_str()) * 3600, 0, "pool.ntp.org", "time.nist.gov");
-        configTime(0, 0, "pool.ntp.org", "time.nist.gov");
+        configTime(atoi(timezone.c_str()) * 3600, 0, "pool.ntp.org", "time.nist.gov");
     } else {
         configTime(0, 0, "pool.ntp.org", "time.nist.gov");
     }
