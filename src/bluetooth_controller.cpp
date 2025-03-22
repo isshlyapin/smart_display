@@ -45,6 +45,13 @@ static void timeMsgHandler(JsonDocument& jsonMsg) {
 static void brightnessMsgHandler(JsonDocument& jsonMsg) {
     const char* value = jsonMsg["value"];
     if (value) {
+        if (NVS.begin()) {
+            Serial.println("brightnessMsgHandler: NVS opened");
+            NVS.setInt("brightness", atoi(value));
+            NVS.close();
+        } else {
+            Serial.println("brightnessMsgHandler: Error opening NVS");
+        }
         DisplayController& displayController = DisplayController::getInstance();
         displayController.setBrightness(atoi(value));
     }

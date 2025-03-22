@@ -1,16 +1,12 @@
 #include <Arduino.h>
 #include <ESP32-HUB75-MatrixPanel-I2S-DMA.h>
 
+#include "config.h"
 #include "wifi_controller.h"
 #include "bluetooth_controller.h"
 #include "temperature_controller.h"
 #include "time_controller.h"
 #include "display.h"
-
-// Константы для временных интервалов (в миллисекундах)
-constexpr uint32_t WIFI_CHECK_DELAY = 500;
-constexpr uint32_t MAIN_LOOP_DELAY = 100;
-constexpr uint32_t TASK_STACK_SIZE = 4096;
 
 DisplayController& displayController = DisplayController::getInstance();
 MatrixPanel_I2S_DMA *display = nullptr;
