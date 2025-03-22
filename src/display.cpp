@@ -10,7 +10,7 @@
 
 static uint32_t BEAUTIFUL_CLOCK_ANIMATION_DELAY = ANIMATION_DELAY;
 
-std::vector<std::pair<int, int>> BEAUTIFUL_CLOCK_NUMS_POSITIONS = {
+static std::vector<std::pair<int, int>> BEAUTIFUL_CLOCK_NUMS_POSITIONS = {
     {3,  9},
     {12, 9},
     {24, 9},
@@ -56,8 +56,7 @@ void draw_image_clock(MatrixPanel_I2S_DMA* display, bool init) {
     display->clearScreen();
     display->setTextSize(1);
     display->setCursor(8, 6);
-    // display->setTextColor(displayController.getColor());
-    display->setTextColor(display->color565(255, 255, 255));
+    display->setTextColor(displayController.getColor());
 
     struct tm timeinfo;
     if (!getLocalTime(&timeinfo)) {
@@ -109,7 +108,9 @@ void draw_image_beautiful_clock(MatrixPanel_I2S_DMA* display, bool init) {
     if (!getLocalTime(&timeinfo)) {
         Serial.println("Failed to obtain time");
     } else {
-        if (init) {
+        uint16_t new_color = displayController.getColor();
+        if (init || color != new_color) {
+            color = new_color;
             update_time(timeinfo, numbers);
             draw_squares(display, color);
             for (int i = 0; i < 6; ++i) {

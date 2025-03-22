@@ -102,11 +102,17 @@ void bluetoothSetup(void* pvParameters) {
     SerialBT.begin(BT_NAME);
     while (1) {
         if (SerialBT.available()) {
+            Serial.printf("Free heap bluetooth1: %d\n", ESP.getFreeHeap());
             Serial.println("Bluetooth message");
             String strMsg = SerialBT.readString();
+            Serial.printf("Message: [%s]\n", strMsg.c_str());
             JsonDocument jsonMsg;
-            if (!deserializeJson(jsonMsg, strMsg)) {
+            Serial.printf("Free heap bluetooth2: %d\n", ESP.getFreeHeap());
+            DeserializationError error =  deserializeJson(jsonMsg, strMsg);
+
+            if (!error) {
                 const char* type = jsonMsg["type"];
+                Serial.printf("Type: [%s]\n", type);
                 if (type) {
                     if (strcmp(type, TYPE_MSG_WIFI) == 0) {
                         Serial.println("Wifi message");
@@ -125,6 +131,8 @@ void bluetoothSetup(void* pvParameters) {
                         colorMsgHandler(jsonMsg);
                     }
                 }   
+            } else {
+                Serial.printf("Error: %s\n", error.c_str());
             }
             strMsg.clear();
             jsonMsg.clear();
