@@ -17,19 +17,27 @@ static void wifiMsgHandler(JsonDocument& jsonMsg) {
     const char* ssid = jsonMsg["ssid"];
     const char* password = jsonMsg["password"];
     if (ssid && password) {
-        NVS.begin();
-        NVS.setString("wifi_ssid", ssid);
-        NVS.setString("wifi_password", password);
-        NVS.close();
+        if (NVS.begin()) {
+            Serial.println("wifiMsgHandler: NVS opened");
+            NVS.setString("wifi_ssid", ssid);
+            NVS.setString("wifi_password", password);
+            NVS.close();
+        } else {
+            Serial.println("wifiMsgHandler: Error opening NVS");
+        }
     }
 }
 
 static void timeMsgHandler(JsonDocument& jsonMsg) {
     const char* timezone = jsonMsg["timezone"];
     if (timezone) {
-        NVS.begin();
-        NVS.setString("timezone", timezone);
-        NVS.close();
+        if (NVS.begin()) {
+            Serial.println("timeMsgHandler: NVS opened");
+            NVS.setString("timezone", timezone);
+            NVS.close();
+        } else {
+            Serial.println("timeMsgHandler: Error opening NVS");
+        }
         configTime(atoi(timezone) * 3600, 0, "pool.ntp.org", "time.nist.gov");
     }
 }
@@ -51,6 +59,8 @@ static void imageMsgHandler(JsonDocument& jsonMsg) {
             displayController.setImage(ImageType::CLOCK_IMAGE);
         } else if (value == ImageType::DHT_IMAGE) {
             displayController.setImage(ImageType::DHT_IMAGE);
+        } else if (value == ImageType::BEAUTIFUL_CLOCK_IMAGE) {
+            displayController.setImage(ImageType::BEAUTIFUL_CLOCK_IMAGE);
         }
     }
 }

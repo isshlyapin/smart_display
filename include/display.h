@@ -13,8 +13,10 @@
 #define PANEL_CHAIN 1
 
 enum ImageType {
+    NOT_IMAGE = -1,
     CLOCK_IMAGE = 0,
-    DHT_IMAGE   = 1
+    DHT_IMAGE   = 1,
+    BEAUTIFUL_CLOCK_IMAGE = 2
 };
 
 class DisplayController {
@@ -59,14 +61,14 @@ class DisplayController {
     }
     
     private:
-    DisplayController() : brightness(100) {
+    DisplayController() : brightness(100), image(ImageType::BEAUTIFUL_CLOCK_IMAGE) {
         HUB75_I2S_CFG mxconfig(
             PANEL_RES_X,   // Ширина одной панели
             PANEL_RES_Y,   // Высота одной панели
             PANEL_CHAIN    // Количество панелей в цепочке
         );
         
-        display = new MatrixPanel_I2S_DMA(mxconfig);
+        display = new MatrixPanel_I2S_DMA(mxconfig);;
     }
     DisplayController(DisplayController const&) = delete;
     void operator=(DisplayController const&) = delete;
@@ -82,10 +84,13 @@ class DisplayController {
     MatrixPanel_I2S_DMA* display;
 };
 
-void draw_image_clock(MatrixPanel_I2S_DMA* display);
-void draw_image_temperature(MatrixPanel_I2S_DMA* display);
+void draw_image_clock(MatrixPanel_I2S_DMA* display, bool init);
+void draw_image_temperature(MatrixPanel_I2S_DMA* display, bool init);
+void draw_image_beautiful_clock(MatrixPanel_I2S_DMA* display, bool init);
 
-static std::vector<void (*)(MatrixPanel_I2S_DMA*)> image_draws{
+
+static std::vector<void (*)(MatrixPanel_I2S_DMA*, bool)> image_draws{
     draw_image_clock,
-    draw_image_temperature
+    draw_image_temperature,
+    draw_image_beautiful_clock
 };

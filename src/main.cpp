@@ -7,39 +7,64 @@
 #include "time_controller.h"
 #include "display.h"
 
+// Константы для временных интервалов (в миллисекундах)
+constexpr uint32_t WIFI_CHECK_DELAY = 500;
+constexpr uint32_t MAIN_LOOP_DELAY = 100;
+constexpr uint32_t TASK_STACK_SIZE = 4096;
+
 DisplayController& displayController = DisplayController::getInstance();
-MatrixPanel_I2S_DMA *display;
+MatrixPanel_I2S_DMA *display = nullptr;
+
+// Обновление яркости дисплея
+void updateBrightness() {
+    static int lastBrightness = -1;
+    int currentBrightness = displayController.getBrightness();
+    
+    if (lastBrightness != currentBrightness) {
+        display->setBrightness8(currentBrightness);
+        lastBrightness = currentBrightness;
+    }
+}
+
+// Обновление отображаемого изображения
+void updateImage() {
+    static ImageType lastImage = ImageType::NOT_IMAGE;
+    ImageType currentImage = displayController.getImage();
+    
+    if (lastImage != currentImage) {
+        Serial.println("Changing image");
+        Serial.printf("Current image: %d\n", currentImage);
+        
+        display->clearScreen();
+        image_draws[currentImage](display, true);
+        lastImage = currentImage;
+    }
+    
+    image_draws[currentImage](display, false);
+}
 
 void setup() {
     Serial.begin(115200);
+    
+    // Инициализация дисплея
     displayController.begin();
     display = displayController.getDisplay();
     display->setBrightness8(displayController.getBrightness());
 
-    xTaskCreate(bluetoothSetup, "bluetoothSetup", 4096, NULL, 1, NULL);
-    xTaskCreate(wifiSetup, "wifiSetup", 4096, NULL, 1, NULL);
+    // Создание задач для Bluetooth и WiFi
+    xTaskCreate(bluetoothSetup, "bluetoothSetup", TASK_STACK_SIZE, nullptr, 1, nullptr);
+    xTaskCreate(wifiSetup, "wifiSetup", TASK_STACK_SIZE, nullptr, 1, nullptr);
 
+    // Ожидание подключения к WiFi
     while (!isWifiConnected()) {
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(WIFI_CHECK_DELAY / portTICK_PERIOD_MS);
     }
 
     timeSetup();
 }
 
 void loop() {
-    static int current_brightness = 0;
-    if (current_brightness != displayController.getBrightness()) {
-        display->setBrightness8(displayController.getBrightness());
-        current_brightness = displayController.getBrightness();
-    }
-
-    static enum ImageType current_image = ImageType::CLOCK_IMAGE;
-    if (current_image != displayController.getImage()) {
-        current_image = displayController.getImage();
-        Serial.println("Changing image");
-        Serial.printf("Current image: %d\n", current_image);
-    }
-
-    image_draws[current_image](display);
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    updateBrightness();
+    updateImage();
+    vTaskDelay(MAIN_LOOP_DELAY / portTICK_PERIOD_MS);
 }
