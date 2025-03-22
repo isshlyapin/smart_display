@@ -72,6 +72,31 @@ static void imageMsgHandler(JsonDocument& jsonMsg) {
     }
 }
 
+static void colorMsgHandler(JsonDocument& jsonMsg) {
+    const char* r = jsonMsg["r"];
+    const char* g = jsonMsg["g"];
+    const char* b = jsonMsg["b"];
+    if (r && g && b) {
+        if (atoi(r) < 0 || atoi(r) > 255 || atoi(g) < 0 || atoi(g) > 255 || atoi(b) < 0 || atoi(b) > 255) {
+            Serial.println("colorMsgHandler: Invalid color");
+            return;
+        }
+        if (NVS.begin()) {
+            Serial.println("colorMsgHandler: NVS opened");
+            NVS.setInt("color_r", atoi(r));
+            NVS.setInt("color_g", atoi(g));
+            NVS.setInt("color_b", atoi(b));
+            NVS.close();
+        } else {
+            Serial.println("colorMsgHandler: Error opening NVS");
+        }
+        DisplayController& displayController = DisplayController::getInstance();
+        displayController.setColor(atoi(r), atoi(g), atoi(b));
+    } else {
+        Serial.println("colorMsgHandler: Invalid message");
+    }
+}
+
 void bluetoothSetup(void* pvParameters) {
     BluetoothSerial SerialBT;
     SerialBT.begin(BT_NAME);
@@ -95,12 +120,15 @@ void bluetoothSetup(void* pvParameters) {
                     } else if (strcmp(type, TYPE_MSG_IMAGE) == 0) {
                         Serial.println("Image message");
                         imageMsgHandler(jsonMsg);
+                    } else if (strcmp(type, TYPE_MSG_COLOR) == 0) {
+                        Serial.println("Color message");
+                        colorMsgHandler(jsonMsg);
                     }
                 }   
             }
             strMsg.clear();
             jsonMsg.clear();
         }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(BLUETOOTH_CHECK_DELAY / portTICK_PERIOD_MS);
     }
 }

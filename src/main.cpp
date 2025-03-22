@@ -62,5 +62,6 @@ void setup() {
 void loop() {
     updateBrightness();
     updateImage();
+    display->drawPixel(0, 0, display->color565(255, 255, 255));
     vTaskDelay(MAIN_LOOP_DELAY / portTICK_PERIOD_MS);
 }
