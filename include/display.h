@@ -9,6 +9,7 @@
 #include "config.h"
 #include "time_controller.h"
 #include "wifi_controller.h"
+#include "my_pins.h"
 
 #define PANEL_CHAIN 1
 #define PANEL_RES_X 64 
@@ -83,7 +84,8 @@ class DisplayController {
         HUB75_I2S_CFG mxconfig(
             PANEL_RES_X,   // Ширина одной панели
             PANEL_RES_Y,   // Высота одной панели
-            PANEL_CHAIN    // Количество панелей в цепочке
+            PANEL_CHAIN,    // Количество панелей в цепочке
+            my_pins
         );
         
         display = new MatrixPanel_I2S_DMA(mxconfig);
