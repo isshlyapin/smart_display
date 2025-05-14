@@ -88,11 +88,8 @@
 - Расширяемость:
   - Открытый код для добавления собственных шаблонов
 
-
-
-https://github.com/user-attachments/assets/2ec28b51-bb7a-4958-b808-4877aee1a16a
-
-
+<video src="https://github.com/user-attachments/assets/2ec28b51-bb7a-4958-b808-4877aee1a16a" width="480px"> 
+</video>
 
 ## Результаты тестирования
 
@@ -101,7 +98,7 @@ https://github.com/user-attachments/assets/2ec28b51-bb7a-4958-b808-4877aee1a16a
 
 ## QR-код на репозиторий
 
-![qr-code](https://github.com/user-attachments/assets/52fb0847-fe5e-47d9-a059-4c4777c087b7)
+<img src="https://github.com/user-attachments/assets/52fb0847-fe5e-47d9-a059-4c4777c087b7" width="250px" height="250px">
 
 ---
 
