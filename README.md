@@ -101,7 +101,7 @@ https://github.com/user-attachments/assets/2ec28b51-bb7a-4958-b808-4877aee1a16a
 
 ## QR-код на репозиторий
 
-*сюда сгенерированный QR-код с ссылкой на этот репозиторий*
+![qr-code](https://github.com/user-attachments/assets/52fb0847-fe5e-47d9-a059-4c4777c087b7)
 
 ---
 
